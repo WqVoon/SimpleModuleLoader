@@ -17,3 +17,10 @@ registeredModules.push = function (name, callback) {
     this[name] = callback;
     this.count++;
 }
+
+/**
+ * 判断 name 指定的模块是否被注册
+ */
+registeredModules.has = function (name) {
+    return this[name] !== undefined;
+}
