@@ -1,0 +1,7 @@
+{
+  "name": "SimpleModuleLoader",
+  "version": "1.0.0",
+  "dependencies": {
+    "rollup": "^2.23.1"
+  }
+}
