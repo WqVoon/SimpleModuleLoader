@@ -8,10 +8,12 @@
      * 配置对象，属性分别为：
      *  debugMode: 布尔值，表示是否输出调试信息
      *  paths: 记录模块标识及路径
+     *  maxPollingTimes: 记录模块加载的最大轮询次数，超过后判断为无法加载
      */
     var config = {
         debugMode: false,
-        paths: {}
+        paths: {},
+        maxPollingTimes: 30
     };
 
     /**
@@ -159,17 +161,18 @@
      */
     define.run = function (entry) {
         debug("以模块 " + entry + " 作为入口启动");
-        try {
-            loadModules();
-            (function loopRunner() {
-                if (!hasLoadedEnd())
-                    setTimeout(loopRunner);
-                else
-                    require(entry);
-            })();
-        } catch (err) {
-            console.error(err);
-        }
+        loadModules();
+
+        var queryTimes = 0;
+        (function loopRunner() {
+            if (queryTimes >= config.maxPollingTimes)
+                throw "部分模块加载失败";
+            else if (!hasLoadedEnd())
+                setTimeout(loopRunner);
+            else if (queryTimes < config.maxPollingTimes)
+                require(entry);
+            queryTimes++;
+        })();
     };
 
     /**

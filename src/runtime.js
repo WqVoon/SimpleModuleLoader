@@ -2,10 +2,12 @@
  * 配置对象，属性分别为：
  *  debugMode: 布尔值，表示是否输出调试信息
  *  paths: 记录模块标识及路径
+ *  maxPollingTimes: 记录模块加载的最大轮询次数，超过后判断为无法加载
  */
 export var config = {
     debugMode: false,
-    paths: {}
+    paths: {},
+    maxPollingTimes: 30
 };
 
 /**

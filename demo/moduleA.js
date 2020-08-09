@@ -1,5 +1,5 @@
 define("moduleA", function (require, exports) {
-    console.log("ModuleA has been loaded");
+    require('remote').func();
 
     exports.func1 = function () {
         console.log("This is moduleA func1");

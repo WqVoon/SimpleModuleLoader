@@ -20,17 +20,18 @@ define.config = Object.seal(config);
  */
 define.run = function (entry) {
     debug("以模块 " + entry + " 作为入口启动");
-    try {
-        loadModules();
-        (function loopRunner() {
-            if (!hasLoadedEnd())
-                setTimeout(loopRunner);
-            else
-                require(entry);
-        })();
-    } catch (err) {
-        console.error(err);
-    }
+    loadModules();
+
+    var queryTimes = 0;
+    (function loopRunner() {
+        if (queryTimes >= config.maxPollingTimes)
+            throw "部分模块加载失败";
+        else if (!hasLoadedEnd())
+            setTimeout(loopRunner);
+        else if (queryTimes < config.maxPollingTimes)
+            require(entry);
+        queryTimes++;
+    })();
 }
 
 /**
