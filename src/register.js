@@ -1,3 +1,5 @@
+import {debug} from "./runtime";
+
 /**
  * 保存被 define 注册的模块，内部每一项的
  *  key: 模块的唯一标识
@@ -16,6 +18,7 @@ registeredModules.count = 0;
 registeredModules.push = function (name, callback) {
     this[name] = callback;
     this.count++;
+    debug("* 注册了 " + name + " 模块");
 }
 
 /**

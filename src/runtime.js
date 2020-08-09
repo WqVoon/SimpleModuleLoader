@@ -1,9 +1,11 @@
 /**
  * 配置对象，属性分别为：
  *  debugMode: 布尔值，表示是否输出调试信息
+ *  paths: 记录模块标识及路径
  */
 export var config = {
-    debugMode: true
+    debugMode: false,
+    paths: {}
 };
 
 /**
@@ -43,4 +45,25 @@ indent.dec = function () {
  */
 indent.get = function () {
     return this.indent;
+}
+
+/**
+ * 制作一个 script 标签并插入到文档的结尾
+ */
+function insertScript(src) {
+    let scriptNode = document.createElement('script');
+    scriptNode.src = src;
+    scriptNode.async = false;
+    document.body.appendChild(scriptNode);
+}
+
+/**
+ * 加载 config.paths 里的所有模块
+ */
+export function loadModules() {
+    let pathsKeys = Object.keys(config.paths);
+    config.paths.count = pathsKeys.length;
+    pathsKeys.forEach(function (key) {
+        insertScript(config.paths[key]);
+    });
 }

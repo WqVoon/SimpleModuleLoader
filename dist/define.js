@@ -5,38 +5,13 @@
 }(this, (function () { 'use strict';
 
     /**
-     * 保存被 define 注册的模块，内部每一项的
-     *  key: 模块的唯一标识
-     *  value: 模块的具体代码
-     */
-    var registeredModules = {};
-
-    /**
-     * 记录被注册的模块数量
-     */
-    registeredModules.count = 0;
-
-    /**
-     * 添加一个模块
-     */
-    registeredModules.push = function (name, callback) {
-        this[name] = callback;
-        this.count++;
-    };
-
-    /**
-     * 判断 name 指定的模块是否被注册
-     */
-    registeredModules.has = function (name) {
-        return this[name] !== undefined;
-    };
-
-    /**
      * 配置对象，属性分别为：
      *  debugMode: 布尔值，表示是否输出调试信息
+     *  paths: 记录模块标识及路径
      */
     var config = {
-        debugMode: true
+        debugMode: false,
+        paths: {}
     };
 
     /**
@@ -76,6 +51,55 @@
      */
     indent.get = function () {
         return this.indent;
+    };
+
+    /**
+     * 制作一个 script 标签并插入到文档的结尾
+     */
+    function insertScript(src) {
+        let scriptNode = document.createElement('script');
+        scriptNode.src = src;
+        scriptNode.async = false;
+        document.body.appendChild(scriptNode);
+    }
+
+    /**
+     * 加载 config.paths 里的所有模块
+     */
+    function loadModules() {
+        let pathsKeys = Object.keys(config.paths);
+        config.paths.count = pathsKeys.length;
+        pathsKeys.forEach(function (key) {
+            insertScript(config.paths[key]);
+        });
+    }
+
+    /**
+     * 保存被 define 注册的模块，内部每一项的
+     *  key: 模块的唯一标识
+     *  value: 模块的具体代码
+     */
+    var registeredModules = {};
+
+    /**
+     * 记录被注册的模块数量
+     */
+    registeredModules.count = 0;
+
+    /**
+     * 添加一个模块
+     */
+    registeredModules.push = function (name, callback) {
+        this[name] = callback;
+        this.count++;
+        debug("* 注册了 " + name + " 模块");
+    };
+
+    /**
+     * 判断 name 指定的模块是否被注册
+     */
+    registeredModules.has = function (name) {
+        return this[name] !== undefined;
     };
 
     /**
@@ -122,7 +146,6 @@
      */
     function define(name, callback) {
         registeredModules.push(name, callback);
-        debug("注册了 " + name + " 模块");
     }
 
     /**
@@ -131,16 +154,30 @@
     define.config = Object.seal(config);
 
     /**
-     * 以 entry 作为模块标识来运行之
+     * 加载 config.paths 中的所有模块
+     * 加载成功后以 entry 作为模块标识来运行之
      */
     define.run = function (entry) {
         debug("以模块 " + entry + " 作为入口启动");
         try {
-            require(entry);
+            loadModules();
+            (function loopRunner() {
+                if (!hasLoadedEnd())
+                    setTimeout(loopRunner);
+                else
+                    require(entry);
+            })();
         } catch (err) {
             console.error(err);
         }
     };
+
+    /**
+     * 是否加载完成
+     */
+    function hasLoadedEnd() {
+        return registeredModules.count === config.paths.count
+    }
 
     return define;
 

@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="../dist/define.js"></script>
-    <script src="entry.js"></script>
-    <script src="moduleA.js"></script>
 </head>
 <body>
+    <h1>Script 之前的 DOM</h1>
     <script>
+        define.config.debugMode = true;
+        define.config.paths = {
+            "main": "./entry.js",
+            "moduleA": "./moduleA.js"
+        };
         define.run("main");
     </script>
+    <h1>Script 之后的 DOM</h1>
 </body>
 </html>
