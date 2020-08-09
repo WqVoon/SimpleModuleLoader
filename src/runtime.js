@@ -13,22 +13,34 @@ export function debug(msg) {
     config.debugMode && console.warn("[DEBUG]", indent.get() + msg);
 }
 
+/**
+ * 用于记录当前 debug 信息的缩进（只是为了更好看一点）
+ */
 var indent = debug.indent = {
     char: '  ',
     buffer: [],
     indent: ""
 }
 
+/**
+ * 增加一个缩进长度
+ */
 indent.add = function () {
     config.debugMode && this.buffer.push(this.char);
     this.indent = this.buffer.join("");
 }
 
+/**
+ * 减少一个缩进字符
+ */
 indent.dec = function () {
     config.debugMode && this.buffer.pop();
     this.indent = this.buffer.join("");
 }
 
+/**
+ * 获得当前的缩进
+ */
 indent.get = function () {
     return this.indent;
 }
